@@ -9,9 +9,16 @@ import SwiftUI
 
 @main
 struct planItApp: App {
+    
+    @StateObject var listViewModel : ListViewModel = ListViewModel()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavigationView{
+                ListView()
+            }
+            .navigationViewStyle(StackNavigationViewStyle())
+            .environmentObject(listViewModel)
         }
     }
 }
