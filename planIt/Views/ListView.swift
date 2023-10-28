@@ -6,9 +6,10 @@
 //
 
 import SwiftUI
+import RealmSwift
 
 struct ListView: View {
-    @EnvironmentObject var listViewModel :ListViewModel
+    @StateObject var listViewModel : ListViewModel 
     
     var body: some View {
         List{
@@ -19,9 +20,18 @@ struct ListView: View {
                             listViewModel.updateItem(item: item)
                         }
                     }
+
             }
-            .onDelete(perform: listViewModel.deleteItem)
-            .onMove(perform: listViewModel.moveItem)
+            .onDelete(perform: { indexSet in
+                for index in indexSet{
+                   let item = listViewModel.items[index]
+                    listViewModel.deleteItem(item: item)
+                }
+            })
+            .onMove { indexSet, newIndex in
+                listViewModel.moveItem(from: indexSet, to: newIndex)
+            }
+            
             
         }
         
@@ -38,10 +48,11 @@ struct ListView: View {
 
 struct ListView_Previews: PreviewProvider {
     static var previews: some View {
+        let realm = try! Realm()
         NavigationView{
-            ListView()
+            ListView(listViewModel: ListViewModel(realm: realm))
         }
-        .environmentObject(ListViewModel())
+        .environmentObject(ListViewModel(realm: realm))
     }
 }
 
