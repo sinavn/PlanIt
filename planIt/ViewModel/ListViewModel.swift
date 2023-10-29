@@ -8,81 +8,90 @@
 import Foundation
 import RealmSwift
 
-class ListViewModel :ObservableObject {
-    @Published var items : Results<ItemModel>
-   
-    private var realm :Realm
+class ListViewModel:ObservableObject{
     
-    init(realm : Realm){
-        self.realm = realm
-        self.items = realm.objects(ItemModel.self)
+    @Published var items : Results<ItemModel>
+//    {
+//        didSet{
+//            listItems.append(objectsIn: items)
+//        }
+//    }
+    
+//    @Published var listItems = List<ItemModel>()
+    
+    private var realm: Realm
+    
+    private var notificationToken: NotificationToken?
+    
+//    private var allItems :Results<ItemModel>
+    init() {
+        realm = try! Realm()
+        
+//       let itemss = realm.objects(ItemModel.self)
+//        items.append(objectsIn: itemss)
+        
+        items = realm.objects(ItemModel.self)
+
+        notificationToken = items.observe { [weak self] _ in
+            self?.objectWillChange.send()
+        }
+        
     }
     //MARK: - CRUD
     
 
-    func addItem (item : String){
-        try! realm.write{
-            let newItem = ItemModel()
-            newItem.title = item
-            realm.add(newItem)
-        }
-    }
-    
-    func deleteItem (item : ItemModel){
-        try! realm.write{
-            realm.delete(item)
-        }
-    }
-    func updateItem (item : ItemModel){
-        try! realm.write{
-            item.isCompleted.toggle()
-        }
-    }
-    func moveItem(from:IndexSet , to: Int){
-        try! realm.write{
-           moveItem(from: from, to: to)
+    func addItem(title: String) {
+        let newItem = ItemModel()
+        newItem.title = title
+        
+        do {
+            try realm.write {
+                realm.add(newItem)
+            }
+            objectWillChange.send()
+        } catch {
+            print("Error adding item: \(error)")
         }
     }
     
     
+    func updateItem(item: ItemModel) {
+        do {
+            try realm.write {
+                item.isCompleted.toggle()
+            }
+            objectWillChange.send()
+        } catch {
+            print("Error updating item: \(error)")
+        }
+    }
+    
+    
+    func deleteItem(item: ItemModel) {
+        do {
+            try realm.write {
+                realm.delete(item)
+            }
+            objectWillChange.send()
+        } catch {
+            print("Error deleting item: \(error)")
+        }
+    }
+    
+//        func moveItem(from source: IndexSet, to destination: Int) {
+//            do {
+//                try realm.write {
+//                    items.move(fromOffsets: source, toOffset: destination)
+//
+//                }
+//            } catch {
+//                print("Error moving item: \(error)")
+//            }
+//        }
+//
+    deinit {
+           notificationToken?.invalidate()
+       }
 }
 
 
-
-
-
-
-
-
-
-
-//class ListViewModel : ObservableObject {
-//    @Published var items : [ItemModel] = []
-//
-//    init() {
-//        getItems()
-//    }
-//    func getItems (){
-//        let newItems =
-//        [ItemModel(title: "first item ", isCompleted: false),
-//        ItemModel(title: "second item", isCompleted: true),
-//        ItemModel(title: "third item", isCompleted: false)]
-//        items.append(contentsOf: newItems)
-//    }
-//    //MARK: - CRUD
-//    func deleteItem(indexSet : IndexSet){
-//        items.remove(atOffsets: indexSet)
-//    }
-//    func moveItem(from:IndexSet , to:Int){
-//        items.move(fromOffsets: from, toOffset: to)
-//    }
-//    func addItem (title : String){
-//        let newItem = ItemModel(title: title, isCompleted: false)
-//        items.append(newItem)
-//    }
-//    func updateItem(item :ItemModel){
-//        if let index = items.firstIndex(where: {$0.id == item.id}){
-//            items[index] = item.updateModel()
-//       }
-//    }
-//}

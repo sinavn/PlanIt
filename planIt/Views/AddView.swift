@@ -11,6 +11,7 @@ struct AddView: View {
     
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var listViewModel : ListViewModel
+    
     @State var textFieldText :String = ""
     
     @State var alertTitle :String = ""
@@ -44,7 +45,7 @@ struct AddView: View {
     
     func saveButtonPressed(){
         if textIsAppropriate(){
-            listViewModel.addItem(item: textFieldText)
+            listViewModel.addItem(title: textFieldText)
             presentationMode.wrappedValue.dismiss()
         }
         
@@ -71,6 +72,6 @@ struct AddView_Previews: PreviewProvider {
         NavigationView{
             AddView()
         }
-        .environmentObject(ListViewModel(realm: realm))
+        .environmentObject(ListViewModel())
     }
 }

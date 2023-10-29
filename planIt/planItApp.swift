@@ -11,31 +11,21 @@ import RealmSwift
 
 @main
 struct planItApp: SwiftUI.App {
-    var body: some Scene {
-        let realm = try! Realm()
-          WindowGroup {
-              ListView(listViewModel: ListViewModel(realm: realm))
-                .environment(\.realmConfiguration, Realm.Configuration( /* ... */ ))
-          }
-      }
-    
-    
-    
-//    @EnvironmentObject var listViewModel: ListViewModel
-////    @StateObject var listViewModel : ListViewModel = ListViewModel(realm: realm )
-//
-//    var body: some Scene {
-//        let realm = try! Realm()
-////        WindowGroup {
-//            NavigationView{
-//                ListView(listViewModel: ListViewModel(realm: realm))
-//            }
-//              .environment(\.realmConfiguration, Realm.Configuration( /* ... */ ))
-////            .environmentObject(listViewModel)
-//        }
-//    }
-}
+    let realm = try! Realm()
+        
+    @StateObject var listViewModel : ListViewModel = ListViewModel( )
 
+    var body: some Scene {
+        
+        WindowGroup {
+            NavigationView{
+                ListView()
+            }
+            .environmentObject(listViewModel)
+        }
+    }
+}
+//
 
 
 

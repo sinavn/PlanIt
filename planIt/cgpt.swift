@@ -148,3 +148,160 @@
 //
 //
 ////That's it! You now have a todo list app that uses Realm to store and manage your todo items.
+
+
+
+
+
+
+
+
+
+
+//import SwiftUI
+//import RealmSwift
+//
+//struct ItemModel: Identifiable {
+//    @objc dynamic var id = UUID().uuidString
+//    @objc dynamic var title: String = ""
+//}
+//
+//class ListViewModel: ObservableObject {
+//    @Published var items: Results<ItemModel>
+//    private var realm: Realm
+//    private var notificationToken: NotificationToken?
+//
+//    init(realm: Realm) {
+//        self.realm = realm
+//        self.items = realm.objects(ItemModel.self)
+//
+//        notificationToken = items.observe { [weak self] _ in
+//            self?.objectWillChange.send()
+//        }
+//    }
+//
+//    func addItem(title: String) {
+//        let newItem = ItemModel()
+//        newItem.title = title
+//
+//        do {
+//            try realm.write {
+//                realm.add(newItem)
+//            }
+//        } catch {
+//            print("Error adding item: \(error)")
+//        }
+//    }
+//
+//    func updateItem(item: ItemModel) {
+//        do {
+//            try realm.write {
+//                item.title += " updated"
+//            }
+//        } catch {
+//            print("Error updating item: \(error)")
+//        }
+//    }
+//
+//    func deleteItem(item: ItemModel) {
+//        do {
+//            try realm.write {
+//                realm.delete(item)
+//            }
+//        } catch {
+//            print("Error deleting item: \(error)")
+//        }
+//    }
+//
+//    func moveItem(from source: IndexSet, to destination: Int) {
+//        do {
+//            try realm.write {
+//                items.move(fromOffsets: source, toOffset: destination)
+//            }
+//        } catch {
+//            print("Error moving item: \(error)")
+//        }
+//    }
+//
+//    deinit {
+//        notificationToken?.invalidate()
+//    }
+//}
+//
+//struct ListView: View {
+//    @EnvironmentObject var listViewModel: ListViewModel
+//
+//    var body: some View {
+//        List {
+//            ForEach(listViewModel.items) { item in
+//                ListRowView(item: item)
+//                    .onTapGesture {
+//                        withAnimation(.linear){
+//                            listViewModel.updateItem(item: item)
+//                        }
+//                    }
+//            }
+//            .onDelete { indexSet in
+//                for index in indexSet {
+//                    let item = listViewModel.items[index]
+//                    listViewModel.deleteItem(item: item)
+//                }
+//            }
+//            .onMove { indexSet, newIndex in
+//                listViewModel.moveItem(from: indexSet, to: newIndex)
+//            }
+//        }
+//        .listStyle(.plain)
+//        .navigationTitle("plan It 📝")
+//        .navigationBarItems(leading: EditButton(), trailing:
+//            NavigationLink("add", destination: AddView())
+//        )
+//    }
+//}
+//
+//struct AddView: View {
+//    @State private var title = ""
+//    @EnvironmentObject var listViewModel: ListViewModel
+//
+//    var body: some View {
+//        Form {
+//            Section(header: Text("Title")) {
+//                TextField("Enter title", text: $title)
+//            }
+//
+//            Button(action: addItem) {
+//                Text("Add")
+//            }
+//        }
+//        .navigationBarTitle("Add Item")
+//    }
+//
+//    func addItem() {
+//        listViewModel.addItem(title: title)
+//    }
+//}
+//
+//struct ListRowView: View {
+//    let item: ItemModel
+//
+//    var body: some View {
+//        Text(item.title)
+//    }
+//}
+//
+//struct ContentView: View {
+//    let realm = try! Realm()
+//
+//    var body: some View {
+//        NavigationView {
+//            ListView()
+//                .environmentObject(ListViewModel(realm: realm))
+//        }
+//    }
+//}
+//
+//struct ContentView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        ContentView()
+//    }
+//}
